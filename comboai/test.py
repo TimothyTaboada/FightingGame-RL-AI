@@ -2,6 +2,24 @@ import diambra.arena
 from stable_baselines3 import A2C
 from stable_baselines3.common.evaluation import evaluate_policy
 
+def prep(agent, env):
+    try:
+        # Load the trained agent
+        # NOTE: if you have loading issue, you can pass `print_system_info=True`
+        # to compare the system on which the agent was trained vs the current one
+        # agent = A2C.load("a2c_doapp", env=env, print_system_info=True)
+        agent = A2C.load("a2c_sfiii3n", env=env)
+    except:
+        # Save the agent
+        agent.save("a2c_sfiii3n")
+        # Load the agent
+        agent = A2C.load("a2c_sfiii3n", env=env)
+    
+    return agent
+
+def save_agent(agent):
+    agent.save("a2c_sfiii3n")
+
 def main():
     # Settings
     settings = {}
@@ -48,16 +66,11 @@ def main():
 
     # Instantiate the agent
     agent = A2C("CnnPolicy", env)
+
     # Train the agent
     agent.learn(total_timesteps=200)
-    # Save the agent
-    agent.save("a2c_sfiii3n")
 
-    # Load the trained agent
-    # NOTE: if you have loading issue, you can pass `print_system_info=True`
-    # to compare the system on which the agent was trained vs the current one
-    # agent = A2C.load("a2c_doapp", env=env, print_system_info=True)
-    agent = A2C.load("a2c_sfiii3n", env=env)
+    agent = prep(agent, env)
 
     # Evaluate the agent
     # NOTE: If you use wrappers with your environment that modify rewards,
@@ -95,6 +108,8 @@ def main():
             break
 
     env.close()
+
+    save_agent(agent)
 
     return 0
 
