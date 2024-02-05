@@ -6,40 +6,15 @@ from stable_baselines3.common.evaluation import evaluate_policy
 from datetime import datetime
 
 def prep(agent, env):
-    try:
-        # Load the trained agent
-        # NOTE: if you have loading issue, you can pass `print_system_info=True`
-        # to compare the system on which the agent was trained vs the current one
-        # agent = A2C.load("a2c_doapp", env=env, print_system_info=True)
-        agent = A2C.load("a2c_sfiii3n", env=env)
-    except:
-        # Save the agent
-        agent.save("a2c_sfiii3n")
-        # Load the agent
-        agent = A2C.load("a2c_sfiii3n", env=env)
+    # Load the trained agent
+    # NOTE: if you have loading issue, you can pass `print_system_info=True`
+    # to compare the system on which the agent was trained vs the current one
+    # agent = A2C.load("a2c_doapp", env=env, print_system_info=True)
+    agent = A2C.load("a2c_sfiii3n", env=env)
     
     return agent
 
-def save_agent(agent):
-    agent.save("a2c_sfiii3n")
-
-def load_cumulative_rewards():
-    cumulative_rewards = []
-    if os.path.exists('cumulative_rewards.json'):
-        with open('cumulative_rewards.json', 'r') as json_file:
-            cumulative_rewards = json.load(json_file)
-    return cumulative_rewards
-
-def save_cumulative_rewards(cumulative_rewards):
-    with open('cumulative_rewards.json', 'w') as json_file:
-        json.dump(cumulative_rewards, json_file)
-
 def main():
-    cumulative_rewards = load_cumulative_rewards()
-
-    # Continue training or start from scratch
-    existing_iterations = len(cumulative_rewards)
-
     # Settings start here
     settings = {}
 
@@ -89,7 +64,7 @@ def main():
     agent = A2C("CnnPolicy", env)
 
     # Train the agent
-    agent.learn(total_timesteps=10000)
+    agent.learn(total_timesteps=0)
 
     agent = prep(agent, env)
 
@@ -114,26 +89,12 @@ def main():
         print("Actions: {}".format(actions))
 
         observation, reward, done, info = env.step(actions)
-        # env.show_obs(observation)
-        cumulative_reward += reward
-
-        print("Reward: {}".format(reward))
-        print("Done: {}".format(done))
-        print("Info: {}".format(info))
-        if (reward != 0):
-            print("Cumulative reward =", cumulative_reward)
 
         if done:
             observation = env.reset()
-            # env.show_obs(observation)
-            current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            cumulative_rewards.append({'date': current_date, 'cumulative_reward': cumulative_reward})
-            save_cumulative_rewards(cumulative_rewards)
             break
 
     env.close()
-
-    save_agent(agent)
 
     return 0
 
