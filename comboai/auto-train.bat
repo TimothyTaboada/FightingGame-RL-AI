@@ -2,9 +2,9 @@
 setlocal
 
 rem Set the number of times you want to run the command
-set "iterations=30"
+set "iterations=10"
 
-rem Your command goes here
+rem Replace with path to your DIAMBRA roms folder
 set "yourCommand=diambra run -r C:\Users\Asus\.diambra\roms python test.py"
 
 rem Loop through the specified number of iterations

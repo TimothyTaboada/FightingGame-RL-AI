@@ -3,6 +3,7 @@ import json
 import os.path
 from stable_baselines3 import A2C
 from stable_baselines3.common.evaluation import evaluate_policy
+from diambra.arena.stable_baselines3.make_sb3_env import make_sb3_env
 from datetime import datetime
 
 def prep(agent, env):
@@ -11,12 +12,14 @@ def prep(agent, env):
         # NOTE: if you have loading issue, you can pass `print_system_info=True`
         # to compare the system on which the agent was trained vs the current one
         # agent = A2C.load("a2c_doapp", env=env, print_system_info=True)
-        agent = A2C.load("a2c_sfiii3n", env=env)
+        print("Loaded")
+        agent = A2C.load("a2c_sfiii3n", env=env, print_system_info=True)
     except:
+        print("Made new")
         # Save the agent
         agent.save("a2c_sfiii3n")
         # Load the agent
-        agent = A2C.load("a2c_sfiii3n", env=env)
+        agent = A2C.load("a2c_sfiii3n", env=env, print_system_info=True)
     
     return agent
 
@@ -48,7 +51,7 @@ def main():
 
     # Number of steps performed by the game
     # for every environment step, bounds: [1, 6]
-    # settings["step_ratio"] = 6
+    settings["step_ratio"] = 6
 
     # Native frame resize operation
     # settings["frame_shape"] = (480, 480, 0)  # RBG with 128x128 size
@@ -85,19 +88,25 @@ def main():
 
     env = diambra.arena.make("sfiii3n", settings)
 
+    # env, num_envs = make_sb3_env("sfiii3n", settings)
+
     # Instantiate the agent
     agent = A2C("CnnPolicy", env)
+    
+    prep(agent, env)
+
+    agent.set_env(env)
 
     # Train the agent
-    agent.learn(total_timesteps=10000)
+    agent.learn(total_timesteps=30000, progress_bar=True)
 
-    agent = prep(agent, env)
+    save_agent(agent)
 
     # Evaluate the agent
     # NOTE: If you use wrappers with your environment that modify rewards,
     #       this will be reflected here. To evaluate with original rewards,
     #       wrap environment in a "Monitor" wrapper before other wrappers.
-    mean_reward, std_reward = evaluate_policy(agent, agent.get_env(), n_eval_episodes=3)
+    mean_reward, std_reward = evaluate_policy(model=agent, env=agent.get_env(), n_eval_episodes=3)
     print("Reward: {} (avg) ± {} (std)".format(mean_reward, std_reward))
 
     # Run trained agent
@@ -126,14 +135,12 @@ def main():
         if done:
             observation = env.reset()
             # env.show_obs(observation)
-            current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            current_date = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
             cumulative_rewards.append({'date': current_date, 'cumulative_reward': cumulative_reward})
             save_cumulative_rewards(cumulative_rewards)
             break
 
     env.close()
-
-    save_agent(agent)
 
     return 0
 
