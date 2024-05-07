@@ -6,11 +6,12 @@ Timothy Janssen B. Taboada, CIT-U BSCS
 ### Requirements:
 1. Python
 2. Docker
-3. [Link to DIAMBRA repository just in case](https://github.com/diambra)
+3. [DIAMBRA Account](https://diambra.ai/)
+4. [Link to DIAMBRA repository just in case](https://github.com/diambra)
 ### Running the thing:
 #### Initializing (for fresh download/clone):
 1. `pip install requirements.txt`
-2. Download the model [here](https://drive.google.com/file/d/1igtZyrMhgBdwCauXGNLSPSnVUT3oMgTO/view?usp=sharing) (or train one yourself, if you wanna start from scratch)
+2. Download the model [here](https://drive.google.com/file/d/1igtZyrMhgBdwCauXGNLSPSnVUT3oMgTO/view?usp=sharing) (or train one yourself, if you want to start from scratch)
 #### Training & Testing
 1. Launch Docker
 2. Run `diambra run -r "your directory to DIAMBRA roms folder" python test.py` (sample is in auto-train.bat)
